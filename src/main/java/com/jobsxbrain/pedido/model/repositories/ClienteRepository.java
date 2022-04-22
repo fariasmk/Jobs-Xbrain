@@ -1,4 +1,4 @@
-package com.jobsxbrain.pedido.repositories;
+package com.jobsxbrain.pedido.model.repositories;
 
 import com.jobsxbrain.pedido.model.entities.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
