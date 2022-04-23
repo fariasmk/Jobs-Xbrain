@@ -26,6 +26,11 @@ public class ProdutoController {
         return produto;
     }
 
+    @GetMapping(path = "/lista")
+    public Iterable<Produto> getProdutos() {
+        return produtosRepository.findAll();
+    }
+
     @PostMapping
     public Produto cadastrarProduto(Produto produto) {
         produtosRepository.save(produto);

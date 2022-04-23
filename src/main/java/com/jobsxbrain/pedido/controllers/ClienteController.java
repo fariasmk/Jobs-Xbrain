@@ -1,6 +1,7 @@
 package com.jobsxbrain.pedido.controllers;
 
 import com.jobsxbrain.pedido.model.entities.Cliente;
+import com.jobsxbrain.pedido.model.entities.Pedido;
 import com.jobsxbrain.pedido.model.repositories.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,11 @@ public class ClienteController {
             return null;
         }
         return cliente;
+    }
+
+    @GetMapping("/lista")
+    public Iterable<Cliente> getClientes() {
+        return clientesRepository.findAll();
     }
 
     @PostMapping

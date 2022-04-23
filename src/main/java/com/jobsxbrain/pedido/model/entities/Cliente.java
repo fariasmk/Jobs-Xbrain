@@ -20,14 +20,13 @@ public class Cliente {
     private String nome;
     private String cpf;
     private Date dataNascimento;
+    private String EnderecoEntrega;
 
 
-
-    public Cliente(int id, String nome, String cpf, Date dataNascimento) {
-        this.id = id;
+    public Cliente(String nome, String cpf, Date dataNascimento, String enderecoEntrega) {
         this.nome = nome;
         this.cpf = cpf;
         this.dataNascimento = dataNascimento;
-
+        EnderecoEntrega = enderecoEntrega;
     }
 }
