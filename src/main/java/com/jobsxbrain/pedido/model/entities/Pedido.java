@@ -1,66 +1,59 @@
 package com.jobsxbrain.pedido.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
 @Entity
-public class Pedido {
+@NoArgsConstructor
+public class Pedido implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Access(AccessType.PROPERTY)
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name="clienteId")
+    @JoinColumn(name = "clienteId")
     private Cliente cliente;
-
-    private String EnderecoEntrega;
 
     private BigDecimal totalCompra;
 
-    private Date dataCompra;
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate dataCompra;
 
     private boolean entregaEfetuada;
 
     @Access(AccessType.PROPERTY)
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "produtoId")
     private List<Produto> produtos;
 
-    public Pedido() {
+    public Pedido(Integer id, Cliente cliente, List<Produto> produtos) {
         super();
-        this.totalCompra = BigDecimal.ZERO;
-        this.dataCompra = new Date();
-        this.entregaEfetuada = false;
+        this.id = id;
+        this.cliente = cliente;
+        this.produtos = produtos;
     }
+
 
     public void calcularValorTotal() {
         this.totalCompra = BigDecimal.ZERO;
-        for(Produto produto : produtos)
+        for (Produto produto : produtos)
             this.totalCompra = this.totalCompra.add(produto.getPreco().multiply(produto.getQuantidade()));
     }
 
-    public boolean adicionaProduto(Produto produto) {
-        if(produto.getQuantidade().compareTo(BigDecimal.ZERO) > 0) {
-            this.produtos.add(produto);
-            this.calcularValorTotal();
-            return true;
-        }
-        return false;
-    }
+//    public void setIdPedidoNoProduto(Pedido pedido) {
+//        for (Produto produto : produtos)
+//            produto.setPedido(pedido.getId());
+//    }
 
-    public boolean removeProduto(Produto produto) {
-        for(Produto produtoTemp : produtos) {
-            if(produtoTemp.equals(produto)) {
-                produtos.remove(produtoTemp);
-                return true;
-            }
-        }
-        return false;
-    }
 }

@@ -1,69 +1,57 @@
 package com.jobsxbrain.pedido.controllers;
 
-import com.jobsxbrain.pedido.model.entities.Produto;
-import com.jobsxbrain.pedido.model.repositories.ProdutoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
+import com.jobsxbrain.pedido.model.entities.Produto;
+import com.jobsxbrain.pedido.service.ProdutoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
 
 @RestController
-@RequestMapping("/produto")
+@RequestMapping(path = "/produto")
 public class ProdutoController {
 
     @Autowired
-    ProdutoRepository produtosRepository;
+    private ProdutoService produtoService;
 
-    @GetMapping
-    public Produto getProduto(int id) {
-        Produto produto = new Produto();
-        try {
-            produto = produtosRepository.findById(id);
-
-        } catch (Exception e) {
-            return null;
-        }
-        return produto;
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Produto> findById(@PathVariable Integer id) {
+        Produto produto = produtoService.findById(id);
+        return ResponseEntity.ok().body(produto);
     }
 
-    @GetMapping(path = "/lista")
-    public Iterable<Produto> getProdutos() {
-        return produtosRepository.findAll();
+    @GetMapping
+    public ResponseEntity<List<Produto>> listAll() {
+        List<Produto> list = produtoService.findAll();
+        return ResponseEntity.ok().body(list);
     }
 
     @PostMapping
-    public Produto cadastrarProduto(Produto produto) {
-        produtosRepository.save(produto);
-        return produto;
+    public ResponseEntity<Produto> create(@RequestBody Produto produto) {
+        produto = produtoService.create(produto);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(produto.getId()).toUri();
+        return ResponseEntity.created(uri).build();
     }
 
-    @PutMapping("/alterarProduto")
-    public String alterarProdutoById(int id, String nome, String descricao, BigDecimal preco, BigDecimal quantidade) {
-        Produto produto = new Produto();
-        try {
-            produto = produtosRepository.findById(id);
-        } catch (Exception e) {
-            return "Produto não encontrado";
-        }
-
-        produto.setNome(nome);
-        produto.setDescricao(descricao);
-        produto.setPreco(preco);
-        produto.setQuantidade(quantidade);
-        produtosRepository.save(produto);
-        return "Produto " + produto.getNome() + " alterado!";
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Produto> update(@PathVariable Integer id, @RequestBody Produto produto) {
+        Produto newProduto= produtoService.update(id, produto);
+        return ResponseEntity.ok().body(newProduto);
     }
 
-    @DeleteMapping("{id}")
-    public String delete(int id) {
-        Produto produto = new Produto();
-        try {
-            produto = produtosRepository.findById(id);
-        } catch (Exception e) {
-            return "Produto não encontrado";
-        }
+//    public Book update(Book book) {
+//        if (book.getId() == null) {
+//            throw new IllegalArgumentException("Dont find book with this ID");
+//        }
+//        return bookRepository.save(book);
 
-        produtosRepository.delete(produto);
-        return null;
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        produtoService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
